@@ -36,7 +36,7 @@ public class Recv2 {
                 }
             }
         };
-        boolean autoAck=true;
+        boolean autoAck=true; //自动应答
         channel.basicConsume(QUEUE_NAME,autoAck,consumer);
 
     }

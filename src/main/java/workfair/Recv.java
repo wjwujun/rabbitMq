@@ -1,4 +1,4 @@
-package workQueue;
+package workfair;
 
 import com.rabbitmq.client.*;
 import com.utils.rabbitMq.ConnectUtils;
@@ -16,9 +16,11 @@ public class Recv {
         //获取连接
         Connection connection = ConnectUtils.getConnection();
         //创建频道
-        Channel channel = connection.createChannel();
+        final Channel channel = connection.createChannel();
         //队列申明
         channel.queueDeclare(QUEUE_NAME,false,false,false,null);
+        channel.basicQos(1);//保证一次只分发一个
+
 
         //定义队列的消费者
         DefaultConsumer consumer=new DefaultConsumer(channel){
@@ -33,10 +35,12 @@ public class Recv {
                     e.printStackTrace();
                 }finally {
                     System.out.println("[1] done");
+                    //手动回复生产者信息
+                    channel.basicAck(envelope.getDeliveryTag(),false);
                 }
             }
         };
-        boolean autoAck=true; //自动应答
+        boolean autoAck=false;//自动应答 改成false
         channel.basicConsume(QUEUE_NAME,autoAck,consumer);
 
     }
